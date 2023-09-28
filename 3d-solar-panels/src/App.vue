@@ -50,9 +50,7 @@ onMounted(() => {
   // LOAD GLTF
   const loader = new GLTFLoader().setPath("src/assets/3d-models/");
   const textureLoader = new TextureLoader();
-  const solarTexture1 = textureLoader.load(
-    "src/assets/3d-models/solar-pattern4.jpg"
-  );
+  const solarTexture1 = textureLoader.load("src/assets/3d-models/solar.webp");
   const solarTexture2 = textureLoader.load(
     "src/assets/3d-models/solar-metal.jpg"
   );
@@ -71,7 +69,6 @@ onMounted(() => {
     solarTexture4,
     solarTexture5,
   ];
-  solarTexture1.repeat.set(0.5, 0.5);
   loader.load("panel.gltf", (gltf) => {
     const mesh = gltf.scene;
     mesh.position.set(0, 0, 0);
@@ -84,6 +81,19 @@ onMounted(() => {
       }
     });
     scene.add(mesh);
+  });
+  loader.load("thinfilm2.gltf", (gltf) => {
+    const mesh2 = gltf.scene;
+    mesh2.position.set(10, 1, 1);
+    mesh2.scale.set(2, 2, 2);
+    // console.log(mesh.getObjectByName("Cube"));
+    // mesh.traverse((node) => {
+    //   if (node.isMesh) {
+    //     console.log(node);
+    //     node.material.map = solarTexture1;
+    //   }
+    // });
+    scene.add(mesh2);
   });
   const renderer = new WebGLRenderer({
     antialias: true,
