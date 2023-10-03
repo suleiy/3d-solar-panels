@@ -11,14 +11,23 @@ import {
   TextureLoader,
   DirectionalLight,
   Vector3,
+  BoxGeometry,
+  MeshBasicMaterial,
 } from "three";
 import { onMounted, ref } from "vue";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { DragControls } from "three/addons/controls/DragControls.js";
+import { RBGELoader } from "../modules/RGBELoader.js";
 
 onMounted(() => {
   const experience = ref<HTMLCanvasElement | null>(null);
   const scene = new Scene();
+
+  var bgLoader = new TextureLoader();
+  bgLoader.load("src/assets/3d-models/bg.jpeg", function (texture) {
+    scene.background = texture;
+  });
   let container = document.getElementById("container") as HTMLElement;
   // CAMERA
   const camera = new PerspectiveCamera(
@@ -42,63 +51,123 @@ onMounted(() => {
   // SPOTLIGHT
   const spotlight = new SpotLight(0xffffff, 5, 0, 250, 1, 0.2);
   // spotlight.position.set(0, 25, 0);
+  spotlight.castShadow = true;
   scene.add(spotlight);
 
   const directionalLight = new DirectionalLight(0xffffff, 10);
+  directionalLight.castShadow = true;
   scene.add(directionalLight);
 
   // LOAD GLTF
   const loader = new GLTFLoader().setPath("src/assets/3d-models/");
   const textureLoader = new TextureLoader();
   const solarTexture1 = textureLoader.load("src/assets/3d-models/solar.webp");
-  const solarTexture2 = textureLoader.load(
-    "src/assets/3d-models/solar-metal.jpg"
-  );
-  const solarTexture3 = textureLoader.load("src/assets/3d-models/solar-n.jpg");
-  const solarTexture4 = textureLoader.load(
-    "src/assets/3d-models/solar-normal.jpg"
-  );
-  const solarTexture5 = textureLoader.load(
-    "src/assets/3d-models/solar-rough.jpg"
-  );
+  const solarTexture2 = textureLoader.load("src/assets/3d-models/black.webp");
 
-  let solarTexture = [
-    solarTexture1,
-    solarTexture2,
-    solarTexture3,
-    solarTexture4,
-    solarTexture5,
-  ];
+  let objects = [] as any;
+  const geometry = new BoxGeometry(5.08, 3.29, 0.01);
+
+  const glassMaterial = new MeshBasicMaterial({
+    color: 0xfffffff,
+    transparent: true,
+    opacity: 0.6,
+  });
+
+  const translucentMaterial = new MeshBasicMaterial({
+    color: 0xfffffff,
+    transparent: true,
+    opacity: 0.4,
+  });
+
+  const cellMaterial = new MeshBasicMaterial({
+    color: 0xfffffff,
+  });
+  //tempered glass
+  const glass1 = new Mesh(geometry, glassMaterial);
+  glass1.position.set(1.4, 1.4, -0.65);
+  glass1.rotation.x = -80.1;
+  glass1.rotation.y = -0.2;
+  objects.push(glass1);
+  scene.add(glass1);
+
+  // EVA
+  const eva1 = new Mesh(geometry, translucentMaterial);
+
+  eva1.position.set(1.4, 1.4, -0.65);
+  eva1.rotation.x = -80.1;
+  eva1.rotation.y = -0.2;
+  objects.push(eva1);
+  scene.add(eva1);
+
+  // solar cells
+  const cells1 = new Mesh(geometry, cellMaterial);
+  cells1.position.set(1.4, 1.4, -0.65);
+  cells1.rotation.x = -80.1;
+  cells1.rotation.y = -0.2;
+  cells1.material.map = solarTexture1;
+  objects.push(cells1);
+  scene.add(cells1);
+
+  // EVA
+  const eva2 = new Mesh(geometry, translucentMaterial);
+  eva2.position.set(1.4, 1.4, -0.65);
+  eva2.rotation.x = -80.1;
+  eva2.rotation.y = -0.2;
+  objects.push(eva2);
+  scene.add(eva2);
+
+  // back sheet
+  const back1 = new Mesh(geometry, cellMaterial);
+  back1.position.set(1.4, 1.4, -0.65);
+  back1.rotation.x = -80.1;
+  back1.rotation.y = -0.2;
+  objects.push(back1);
+  scene.add(back1);
+
+  // aluminium frame
   loader.load("panel.gltf", (gltf) => {
     const mesh = gltf.scene;
-    mesh.position.set(0, 0, 0);
-    mesh.scale.set(2, 2, 2);
-    console.log(mesh.getObjectByName("Cube"));
-    mesh.traverse((node) => {
-      if (node.isMesh) {
-        console.log(node);
-        node.material.map = solarTexture1;
-      }
-    });
+    mesh.position.set(0, -1.4, 0);
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    objects.push(mesh);
     scene.add(mesh);
   });
-  loader.load("thinfilm2.gltf", (gltf) => {
+
+  loader.load("panel.gltf", (gltf) => {
     const mesh2 = gltf.scene;
-    mesh2.position.set(10, 1, 1);
-    mesh2.scale.set(2, 2, 2);
-    // console.log(mesh.getObjectByName("Cube"));
-    // mesh.traverse((node) => {
-    //   if (node.isMesh) {
-    //     console.log(node);
-    //     node.material.map = solarTexture1;
-    //   }
-    // });
+    mesh2.position.set(0, 0, -5);
+    // mesh.scale.set(2, 2, 2);
+    console.log(mesh2.size);
+    mesh2.traverse((node) => {
+      if (node.isMesh) {
+        node.material.map = solarTexture2;
+      }
+    });
+    objects.push(mesh2);
     scene.add(mesh2);
   });
+
+  loader.load("thinfilm2.gltf", (gltf) => {
+    const mesh3 = gltf.scene;
+    mesh3.position.set(0, 0, 5);
+    mesh3.scale.set(2, 2, 2);
+    objects.push(mesh3);
+    scene.add(mesh3);
+  });
+  // let objects = [mesh, mesh2, mesh3];
+
   const renderer = new WebGLRenderer({
     antialias: true,
   });
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  const dControls = new DragControls(objects, camera, renderer.domElement);
+  dControls.enabled = true;
+
+  dControls.deactivate();
+  dControls.activate();
+  renderer.shadowMap.enabled = true;
+
+  renderer.setSize(window.outerWidth, window.outerHeight);
   renderer.setClearColor(0x000000);
 
   renderer.render(scene, camera);
