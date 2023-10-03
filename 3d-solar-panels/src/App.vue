@@ -13,13 +13,17 @@ import {
   Vector3,
   BoxGeometry,
   MeshBasicMaterial,
-  FontLoader,
+  MeshNormalMaterial,
 } from "three";
 import { onMounted, ref } from "vue";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { DragControls } from "three/addons/controls/DragControls.js";
+
 import { RBGELoader } from "../modules/RGBELoader.js";
+import { TTFLoader } from "three/examples/jsm/loaders/TTFLoader";
+import { FontLoader } from "three/examples/jsm/loaders/FontLoader";
+import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry";
 
 onMounted(() => {
   const experience = ref<HTMLCanvasElement | null>(null);
@@ -207,6 +211,51 @@ onMounted(() => {
     scene.add(mesh3);
   });
   // let objects = [mesh, mesh2, mesh3];
+
+  const fontLoader = new FontLoader();
+  fontLoader.load(
+    "node_modules/three/examples/fonts/droid/helvetiker_regular.typeface.json",
+    (droidFont) => {
+      const poly = new TextGeometry("polycrystalline", {
+        height: 0.1,
+        size: 0.5,
+        font: droidFont,
+        bevelEnabled: false,
+      });
+
+      const mono = new TextGeometry("monocrystalline", {
+        height: 0.1,
+        size: 0.5,
+        font: droidFont,
+        bevelEnabled: false,
+      });
+
+      const thin = new TextGeometry("thin-film", {
+        height: 0.1,
+        size: 0.5,
+        font: droidFont,
+        bevelEnabled: false,
+      });
+
+      const textMaterial = new MeshBasicMaterial({ color: "orange" });
+
+      const polyTextMesh = new Mesh(poly, textMaterial);
+      polyTextMesh.rotation.y = -30.02;
+
+      const monoTextMesh = new Mesh(mono, textMaterial);
+      monoTextMesh.rotation.y = -30.02;
+
+      const thinTextMesh = new Mesh(thin, textMaterial);
+      thinTextMesh.rotation.y = -30.02;
+
+      polyTextMesh.position.set(5, 0.5, 2);
+      monoTextMesh.position.set(5, 0.5, -4);
+      thinTextMesh.position.set(5, 0.5, 7);
+      scene.add(polyTextMesh);
+      scene.add(monoTextMesh);
+      scene.add(thinTextMesh);
+    }
+  );
 
   const renderer = new WebGLRenderer({
     antialias: true,
