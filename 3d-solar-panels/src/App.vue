@@ -48,7 +48,7 @@ onMounted(() => {
   const groundGeometry = new PlaneGeometry(20, 20, 32, 32);
   groundGeometry.rotateX(-Math.PI / 2);
   const groundMaterial = new MeshStandardMaterial({
-    color: 0x555555,
+    color: 0x000000,
     side: DoubleSide,
   });
   const groundMesh = new Mesh(groundGeometry, groundMaterial);
@@ -212,48 +212,61 @@ onMounted(() => {
   });
   // let objects = [mesh, mesh2, mesh3];
 
+  //Text
   const fontLoader = new FontLoader();
   fontLoader.load(
     "node_modules/three/examples/fonts/droid/helvetiker_regular.typeface.json",
     (droidFont) => {
+      const choose = new TextGeometry("CHOOSE YOUR PANEL", {
+        height: 0.1,
+        size: 0.3,
+        font: droidFont,
+        bevelEnabled: false,
+      });
       const poly = new TextGeometry("polycrystalline", {
         height: 0.1,
-        size: 0.5,
+        size: 0.3,
         font: droidFont,
         bevelEnabled: false,
       });
 
       const mono = new TextGeometry("monocrystalline", {
         height: 0.1,
-        size: 0.5,
+        size: 0.3,
         font: droidFont,
         bevelEnabled: false,
       });
 
       const thin = new TextGeometry("thin-film", {
         height: 0.1,
-        size: 0.5,
+        size: 0.3,
         font: droidFont,
         bevelEnabled: false,
       });
 
       const textMaterial = new MeshBasicMaterial({ color: "orange" });
+      const titleMaterial = new MeshNormalMaterial();
+
+      const chooseText = new Mesh(choose, titleMaterial);
+      chooseText.rotation.y = -30.03;
 
       const polyTextMesh = new Mesh(poly, textMaterial);
-      polyTextMesh.rotation.y = -30.02;
+      polyTextMesh.rotation.y = -30.03;
 
       const monoTextMesh = new Mesh(mono, textMaterial);
-      monoTextMesh.rotation.y = -30.02;
+      monoTextMesh.rotation.y = -30.03;
 
       const thinTextMesh = new Mesh(thin, textMaterial);
-      thinTextMesh.rotation.y = -30.02;
+      thinTextMesh.rotation.y = -30.03;
 
-      polyTextMesh.position.set(5, 0.5, 2);
+      polyTextMesh.position.set(5, 0.5, 0.8);
       monoTextMesh.position.set(5, 0.5, -4);
-      thinTextMesh.position.set(5, 0.5, 7);
+      thinTextMesh.position.set(5, 0.5, 5.5);
+      chooseText.position.set(5, 5, 0);
       scene.add(polyTextMesh);
       scene.add(monoTextMesh);
       scene.add(thinTextMesh);
+      // scene.add(chooseText);
     }
   );
 
